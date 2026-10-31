@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Masoom Text Expander",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Offline text snippets, shortcut expansion and backups.",
   "permissions": [
     "storage",
