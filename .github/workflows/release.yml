@@ -18,7 +18,7 @@ jobs:
       - name: Create installable ZIP
         run: |
           cd extension
-          zip -r ../Masoom-Text-Expander-Chrome.zip . -x '*.DS_Store'
+          zip -r ../Text-Expander-Chrome.zip . -x '*.DS_Store'
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -28,4 +28,4 @@ jobs:
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             TAG="manual-${GITHUB_RUN_NUMBER}"
           fi
-          gh release create "$TAG" Masoom-Text-Expander-Chrome.zip --title "Masoom Text Expander $TAG" --notes "Extract ZIP; Chrome Extensions > Developer mode > Load unpacked; select the extracted folder with manifest.json." --target "$GITHUB_SHA"
+          gh release create "$TAG" Text-Expander-Chrome.zip --title "Text Expander – Snippets & Shortcuts $TAG" --notes "Extract ZIP; Chrome Extensions > Developer mode > Load unpacked; select the extracted folder with manifest.json." --target "$GITHUB_SHA"
