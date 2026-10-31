@@ -1,0 +1,8 @@
+"use strict";
+const sample=[{id:"welcome",title:"Thank you",shortcut:"/thanks",text:"Thank you for your message! We will get back to you shortly.",folder:"General"},{id:"date",title:"Today",shortcut:"/today",text:"{date}",folder:"General"}];
+let menuQueue=Promise.resolve(),rebuildRequested=false;
+async function rebuildMenu(){rebuildRequested=true;menuQueue=menuQueue.then(async()=>{if(!rebuildRequested)return;rebuildRequested=false;await chrome.contextMenus.removeAll();await chrome.contextMenus.create({id:"root",title:"Masoom Text Expander",contexts:["editable"]});const {snippets=[]}=await chrome.storage.local.get("snippets");for(const s of snippets.slice(0,100)){if(!s.id)continue;await chrome.contextMenus.create({id:"snippet:"+s.id,parentId:"root",title:(s.title||s.shortcut||"Snippet").slice(0,80),contexts:["editable"]})}}).catch(err=>console.error("Menu update failed:",err));return menuQueue}
+chrome.runtime.onInstalled.addListener(async()=>{try{const {snippets}=await chrome.storage.local.get("snippets");if(!Array.isArray(snippets))await chrome.storage.local.set({snippets:sample});await rebuildMenu()}catch(e){console.error(e)}});
+chrome.runtime.onStartup.addListener(()=>{void rebuildMenu()});
+chrome.storage.onChanged.addListener((c,area)=>{if(area==="local"&&c.snippets)void rebuildMenu()});
+chrome.contextMenus.onClicked.addListener(async(info,tab)=>{const id=String(info.menuItemId);if(!id.startsWith("snippet:")||!tab?.id)return;const {snippets=[]}=await chrome.storage.local.get("snippets");const found=snippets.find(s=>id==="snippet:"+s.id);if(found)try{await chrome.tabs.sendMessage(tab.id,{type:"INSERT_SNIPPET",snippet:found},{frameId:info.frameId??0})}catch(e){console.warn("Cannot insert on this page:",e.message)}});
